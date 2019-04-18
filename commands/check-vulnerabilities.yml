@@ -1,0 +1,136 @@
+description: >
+  After running your tests, query the Contrast API to see if any new
+  vulnerabilities were found in your build. Requirements: Python, pip
+
+parameters:
+  python-path:
+    type: string
+    default: /usr/local/bin/python
+    description: >
+      Absolute path to an installed Python shell
+
+  severities:
+    type: string
+    default: CRITICAL,HIGH
+    description: >
+      What level(s) of severity of vulnerabilities are you interested in?
+
+  application-name:
+    type: string
+    description: >
+      Name of your application, as per your `package.json` file
+
+  username:
+    type: env_var_name
+    default: CONTRAST_USERNAME
+    description: >
+      Name of environment variable storing your Contrast username
+
+  service-key:
+    type: env_var_name
+    default: CONTRAST_SERVICE_KEY
+    description: >
+      Name of environment variable storing your Contrast service key
+
+  team-server-url:
+    type: env_var_name
+    default: CONTRAST_TEAM_SERVER_URL
+    description: >
+      Name of environment variable storing the URL of your Contrast
+      team server
+
+  org-id:
+    type: env_var_name
+    default: CONTRAST_ORG_ID
+    description: >
+      Name of environment variable storing your Contrast organization ID
+
+  api-key:
+    type: env_var_name
+    default: CONTRAST_API_KEY
+    description: >
+      Name of environment variable storing your Contrast API key
+
+  vulnerability-threshold:
+    type: integer
+    default: 0
+    description: >
+      For what number or greater of open vulnerabilities would you like
+      your build to fail?
+
+
+steps:
+  - run:
+      name: Install Python modules
+      command: |
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+        $SUDO pip install requests
+
+  - run:
+      name: Query Contrast API
+      shell: <<parameters.python-path>>
+      command: |
+        import base64
+        import datetime
+        import json
+        import requests
+        import urllib
+        import sys
+          
+        # Set the severities you are interested in
+        SEVERITIES = '<<parameters.severities>>'
+         
+        # Set your application name (as per your package.json)
+        url = '<<parameters.team-server-url>>/api/ng/<<parameters.org-id>>/applications/name?'+urllib.urlencode({ 'filterText' : '<<parameters.application-name>>', 'filterServers' : '%teamcity.agent.hostname%' })
+          
+        headers = {
+            'Accept': 'application/json',
+            'API-Key': '<<parameters.api-key>>',
+            'Authorization': base64.b64encode('<<parameters.username>>:<<parameters.service-key>>')
+        }
+          
+        print ('HTTP GET ' + url)
+        response = requests.get(url, headers = headers)
+          
+        # Check the status of the request
+        if (not response.ok):
+            response.raise_for_status()
+            exit()
+          
+        # Parse the JSON content
+        json_data = json.loads(response.content)
+          
+        # Get the application id for the app
+        # TODO: Error handling
+        APP_ID = json_data['applications'][0]['app_id']
+          
+        # Contrast Security API request to get vulnerabilities
+        url = '<<parameters.team-server-url>>/api/ng/<<parameters.org-id>>/traces/'+APP_ID+'/quick?'+urllib.urlencode({ 'severities' : SEVERITIES, 'filterText' : '%env.CIRCLE_BUILD_NUM%' })
+          
+        print ('HTTP GET ' + url)
+        response = requests.get(url, headers = headers)
+          
+        # Check the status of the request
+        if (not response.ok):
+            response.raise_for_status()
+            exit()
+          
+        # Parse the JSON content
+        json_data = json.loads(response.content)
+          
+        vulns_all = 0
+        vulns_open = 0
+          
+        for filter in json_data['filters']:
+            if (filter['name'] == 'All'):
+                vulns_all = filter['count']
+            elif (filter['name'] == 'Open'):
+                vulns_open = filter['count']
+          
+        print ('All vulnerabilities: ' + str(vulns_all))
+        print ('Open vulnerabilities: ' + str(vulns_open))
+
+        # TODO Set the threshold for the number of vulnerabilities (of given severities)
+        if (vulns_open > <<parameters.vulnerability-threshold>>):
+            sys.exit(1)

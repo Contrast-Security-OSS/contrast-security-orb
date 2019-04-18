@@ -1,0 +1,23 @@
+description: >
+  Full Contrast security agent workflow. In the first job, download and
+  install the Contrast agent, then run end-to-end tests. In the second
+  job, query the Contrast API to check for build vulnerabilities.
+
+usage:
+  version: 2.1
+
+  orbs:
+    contrast: contrast/contrast-agent@x.y.z
+
+  workflows:
+    setup-test-check-vulnerabilities:
+      jobs:
+        - contrast/install-test:
+            test-command: |
+              npm run contrast-e2e -- \
+                --application.version=$CIRCLE_BUILD_NUM
+
+        - contrast/check-vulnerabilities:
+            application-name: your-app-name
+            requires:
+              - contrast/install-test

@@ -1,0 +1,66 @@
+description: >
+  Download and install the Contrast security agent, then run your
+  Contrast end-to-end tests
+
+parameters:
+  executor:
+    type: executor
+    default: default
+    description: >
+      Executor within which to run this job, defaults to this orb's own
+      `default` executor. The given execution environment should have
+      Python and pip preinstalled.
+
+  username:
+    type: env_var_name
+    default: CONTRAST_USERNAME
+    description: >
+      Name of environment variable storing your Contrast username
+
+  service-key:
+    type: env_var_name
+    default: CONTRAST_SERVICE_KEY
+    description: >
+      Name of environment variable storing your Contrast service key
+
+  team-server-url:
+    type: env_var_name
+    default: CONTRAST_TEAM_SERVER_URL
+    description: >
+      Name of environment variable storing the URL of your Contrast
+      team server
+
+  org-id:
+    type: env_var_name
+    default: CONTRAST_ORG_ID
+    description: >
+      Name of environment variable storing your Contrast organization ID
+
+  api-key:
+    type: env_var_name
+    default: CONTRAST_API_KEY
+    description: >
+      Name of environment variable storing your Contrast API key
+
+  test-command:
+    type: string
+    description: >
+      Full shell command for your end-to-end tests
+
+executor: <<parameters.executor>>
+
+steps:
+  - checkout
+
+  - contrast/download:
+      username: <<parameters.username>>
+      service-key: <<parameters.service-key>>
+      team-server-url: <<parameters.team-server-url>>
+      org-id: <<parameters.org-id>>
+      api-key: <<parameters.api-key>>
+
+  - contrast/install
+
+  - run:
+      name: Run tests
+      command: <<parameters.test-command>>

@@ -1,0 +1,36 @@
+description: >
+  Within a single job, run tests and then query the Contrast API to
+  check for build vulnerabilities. This example assumes the Contrast
+  agent has already been downloaded in a previous job, or is checked
+  into VCS with your project, and is already installed automatically via
+  a post-install script in your `package.json` file.
+
+usage:
+  version: 2.1
+
+  orbs:
+    contrast: contrast/contrast-agent@x.y.z
+
+  jobs:
+    test:
+      executor: contrast/default
+      steps:
+        - checkout
+
+        - run:
+            name: Run tests
+            command: |
+              npm run contrast-e2e -- \
+                --application.version=$CIRCLE_BUILD_NUM
+
+        - run:
+            name: Wait for TeamServer to check build vulnerabilities
+            command: sleep 30
+
+        - contrast/check-vulnerabilites:
+            application-name: your-app-name
+
+  workflows:
+    test:
+      jobs:
+        - test
