@@ -9,7 +9,7 @@ parameters:
     description: >
       Executor within which to run this job, defaults to this orb's own
       `default` executor. The given execution environment should have
-      Python and pip preinstalled.
+      Node and npm preinstalled.
 
   username:
     type: env_var_name
