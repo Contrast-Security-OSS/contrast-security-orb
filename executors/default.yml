@@ -5,7 +5,7 @@ description: >
 parameters:
   tag:
     type: string
-    default: latest
+    default: latest-node
     description: >
       Pick a specific circleci/python image variant:
       https://hub.docker.com/r/circleci/python/tags
