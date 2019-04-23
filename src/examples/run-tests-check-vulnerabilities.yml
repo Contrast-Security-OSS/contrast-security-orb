@@ -9,11 +9,11 @@ usage:
   version: 2.1
 
   orbs:
-    contrast: contrast/contrast-agent@x.y.z
+    contrast: contrastsecurity/verify@x.y.z
 
   jobs:
     test:
-      executor: contrast/default
+      executor: contrastsecurity/default
       steps:
         - checkout
 
@@ -27,7 +27,7 @@ usage:
             name: Wait for TeamServer to check build vulnerabilities
             command: sleep 30
 
-        - contrast/check-vulnerabilites:
+        - contrastsecurity/check-vulnerabilites:
             application-name: your-app-name
 
   workflows:
