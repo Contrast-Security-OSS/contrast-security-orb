@@ -70,7 +70,7 @@ steps:
   - run:
       name: Query Contrast API
       shell: <<parameters.python-path>>
-      command: |
+      command: |-
         import base64
         import datetime
         import json

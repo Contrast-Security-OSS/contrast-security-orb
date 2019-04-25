@@ -69,7 +69,7 @@ parameters:
 executor: <<parameters.executor>>
 
 steps:
-  - check-vulnerabilites:
+  - check-vulnerabilities:
       python-path: <<parameters.python-path>>
       severities: <<parameters.severities>>
       application-name: <<parameters.application-name>>

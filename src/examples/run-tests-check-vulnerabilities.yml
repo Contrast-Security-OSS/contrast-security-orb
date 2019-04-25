@@ -27,7 +27,7 @@ usage:
             name: Wait for TeamServer to check build vulnerabilities
             command: sleep 30
 
-        - contrastsecurity/check-vulnerabilites:
+        - contrastsecurity/check-vulnerabilities:
             application-name: your-app-name
 
   workflows:
