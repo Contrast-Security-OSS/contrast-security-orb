@@ -11,4 +11,4 @@ parameters:
       https://hub.docker.com/r/circleci/python/tags
 
 docker:
-  - image: circleci/python:<<parameters.tag>>
+  - image: circleci/python:2.7.16-jessie-node-browsers-legacy

@@ -70,67 +70,69 @@ steps:
   - run:
       name: Query Contrast API
       shell: <<parameters.python-path>>
-      command: |-
-        import base64
-        import datetime
-        import json
-        import requests
-        import urllib
-        import sys
-          
+      command: |
+        import base64
+        import datetime
+        import json
+        import requests
+        import urllib
+        import sys
+        import os
+
         # Set the severities you are interested in
-        SEVERITIES = '<<parameters.severities>>'
-         
+        SEVERITIES = '<<parameters.severities>>'
+
         # Set your application name (as per your package.json)
-        url = '<<parameters.team-server-url>>/api/ng/<<parameters.org-id>>/applications/name?'+urllib.urlencode({ 'filterText' : '<<parameters.application-name>>', 'filterServers' : '%teamcity.agent.hostname%' })
-          
-        headers = {
-            'Accept': 'application/json',
-            'API-Key': '<<parameters.api-key>>',
-            'Authorization': base64.b64encode('<<parameters.username>>:<<parameters.service-key>>')
+        url = os.path.expandvars("${<<parameters.team-server-url>>}/api/ng/${<<parameters.org-id>>}/applications/name?")+urllib.urlencode({ 'filterText' : '<<parameters.application-name>>', 'filterServers' : '%teamcity.agent.hostname%' })
+
+        headers = {
+         'Accept': 'application/json',
+         'API-Key': '<<parameters.api-key>>',
+         'Authorization': base64.b64encode('<<parameters.username>>:<<parameters.service-key>>')
         }
-          
-        print ('HTTP GET ' + url)
-        response = requests.get(url, headers = headers)
-          
+
+        print ('HTTP GET ' + url)
+        response = requests.get(url, headers = headers)
+
         # Check the status of the request
-        if (not response.ok):
-            response.raise_for_status()
-            exit()
-          
+        if (not response.ok):
+         response.raise_for_status()
+         exit()
+
         # Parse the JSON content
-        json_data = json.loads(response.content)
-          
+        json_data = json.loads(response.content)
+
         # Get the application id for the app
         # TODO: Error handling
-        APP_ID = json_data['applications'][0]['app_id']
-          
+        APP_ID = json_data['applications'][0]['app_id']
+
         # Contrast Security API request to get vulnerabilities
-        url = '<<parameters.team-server-url>>/api/ng/<<parameters.org-id>>/traces/'+APP_ID+'/quick?'+urllib.urlencode({ 'severities' : SEVERITIES, 'filterText' : '%env.CIRCLE_BUILD_NUM%' })
-          
-        print ('HTTP GET ' + url)
-        response = requests.get(url, headers = headers)
-          
+        url = '<<parameters.team-server-url>>/api/ng/<<parameters.org-id>>/traces/'+APP_ID+'/quick?'+urllib.urlencode({ 'severities' : SEVERITIES, 'filterText' : '%env.CIRCLE_BUILD_NUM%' })
+
+        print ('HTTP GET ' + url)
+        response = requests.get(url, headers = headers)
+
         # Check the status of the request
-        if (not response.ok):
-            response.raise_for_status()
-            exit()
-          
+        if (not response.ok):
+         response.raise_for_status()
+         exit()
+
         # Parse the JSON content
-        json_data = json.loads(response.content)
-          
-        vulns_all = 0
-        vulns_open = 0
-          
-        for filter in json_data['filters']:
-            if (filter['name'] == 'All'):
-                vulns_all = filter['count']
-            elif (filter['name'] == 'Open'):
-                vulns_open = filter['count']
-          
-        print ('All vulnerabilities: ' + str(vulns_all))
-        print ('Open vulnerabilities: ' + str(vulns_open))
+        json_data = json.loads(response.content)
+
+        vulns_all = 0
+        vulns_open = 0
+
+        for filter in json_data['filters']:
+         if (filter['name'] == 'All'):
+          vulns_all = filter['count']
+         elif (filter['name'] == 'Open'):
+          vulns_open = filter['count']
+
+        print ('All vulnerabilities: ' + str(vulns_all))
+        print ('Open vulnerabilities: ' + str(vulns_open))
 
         # TODO Set the threshold for the number of vulnerabilities (of given severities)
-        if (vulns_open > <<parameters.vulnerability-threshold>>):
-            sys.exit(1)
+        if (vulns_open > <<parameters.vulnerability-threshold>>):
+         sys.exit(1)
+        
