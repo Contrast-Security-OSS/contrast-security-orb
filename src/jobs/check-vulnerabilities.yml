@@ -19,14 +19,15 @@ parameters:
 
   severities:
     type: string
-    default: CRITICAL,HIGH
+    default: CRITICAL,HIGH,MEDIUM,LOW,NOTE
     description: >
       What level(s) of severity of vulnerabilities are you interested in?
 
-  application-name:
+  application-id:
     type: string
+    default: ""
     description: >
-      Name of your application, as per your `package.json` file
+      ID of your application in Contrast
 
   username:
     type: env_var_name
@@ -41,14 +42,14 @@ parameters:
       Name of environment variable storing your Contrast service key
 
   team-server-url:
-    type: env_var_name
-    default: CONTRAST_TEAM_SERVER_URL
+    type: string
+    default: https://app.contrastsecurity.com/Contrast
     description: >
       Name of environment variable storing the URL of your Contrast
       team server
 
   org-id:
-    type: env_var_name
+    type: string
     default: CONTRAST_ORG_ID
     description: >
       Name of environment variable storing your Contrast organization ID
@@ -72,7 +73,7 @@ steps:
   - check-vulnerabilities:
       python-path: <<parameters.python-path>>
       severities: <<parameters.severities>>
-      application-name: <<parameters.application-name>>
+      application-id: <<parameters.application-id>>
       username: <<parameters.username>>
       service-key: <<parameters.service-key>>
       team-server-url: <<parameters.team-server-url>>

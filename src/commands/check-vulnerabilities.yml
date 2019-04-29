@@ -11,14 +11,15 @@ parameters:
 
   severities:
     type: string
-    default: CRITICAL,HIGH
+    default: CRITICAL,HIGH,MEDIUM,LOW,NOTE
     description: >
       What level(s) of severity of vulnerabilities are you interested in?
 
-  application-name:
+  application-id:
     type: string
+    default: ""
     description: >
-      Name of your application, as per your `package.json` file
+      ID of your application in Contrast
 
   username:
     type: env_var_name
@@ -33,14 +34,14 @@ parameters:
       Name of environment variable storing your Contrast service key
 
   team-server-url:
-    type: env_var_name
-    default: CONTRAST_TEAM_SERVER_URL
+    type: string
+    default: https://app.contrastsecurity.com/Contrast
     description: >
       Name of environment variable storing the URL of your Contrast
       team server
 
   org-id:
-    type: env_var_name
+    type: string
     default: CONTRAST_ORG_ID
     description: >
       Name of environment variable storing your Contrast organization ID
@@ -68,7 +69,7 @@ steps:
         $SUDO pip install requests
 
   - run:
-      name: Query Contrast API
+      name: Check Contrast for vulnerabilities
       shell: <<parameters.python-path>>
       command: |
         import base64
@@ -80,34 +81,16 @@ steps:
         import os
 
         # Set the severities you are interested in
-        SEVERITIES = '<<parameters.severities>>'
-
-        # Set your application name (as per your package.json)
-        url = os.path.expandvars("${<<parameters.team-server-url>>}/api/ng/${<<parameters.org-id>>}/applications/name?")+urllib.urlencode({ 'filterText' : '<<parameters.application-name>>', 'filterServers' : '%teamcity.agent.hostname%' })
+        SEVERITIES = os.path.expandvars("${<<parameters.severities>>}")
 
         headers = {
          'Accept': 'application/json',
-         'API-Key': '<<parameters.api-key>>',
-         'Authorization': base64.b64encode('<<parameters.username>>:<<parameters.service-key>>')
+         'API-Key': os.path.expandvars("${<<parameters.api-key>>}"),
+         'Authorization': base64.b64encode(os.path.expandvars("${<<parameters.username>>}:${<<parameters.service-key>>}"))
         }
 
-        print ('HTTP GET ' + url)
-        response = requests.get(url, headers = headers)
-
-        # Check the status of the request
-        if (not response.ok):
-         response.raise_for_status()
-         exit()
-
-        # Parse the JSON content
-        json_data = json.loads(response.content)
-
-        # Get the application id for the app
-        # TODO: Error handling
-        APP_ID = json_data['applications'][0]['app_id']
-
         # Contrast Security API request to get vulnerabilities
-        url = '<<parameters.team-server-url>>/api/ng/<<parameters.org-id>>/traces/'+APP_ID+'/quick?'+urllib.urlencode({ 'severities' : SEVERITIES, 'filterText' : '%env.CIRCLE_BUILD_NUM%' })
+        url = "<<parameters.team-server-url>>/api/ng/<<parameters.org-id>>/traces/<<parameters.application-id>>/quick?severities=<<parameters.severities>>"
 
         print ('HTTP GET ' + url)
         response = requests.get(url, headers = headers)
@@ -134,5 +117,6 @@ steps:
 
         # TODO Set the threshold for the number of vulnerabilities (of given severities)
         if (vulns_open > <<parameters.vulnerability-threshold>>):
+         print("Above the vulnerabilities threshold. Failing build.")
          sys.exit(1)
         
