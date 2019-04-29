@@ -41,12 +41,11 @@ parameters:
     description: >
       Name of environment variable storing your Contrast service key
 
-  team-server-url:
+  contrast-url:
     type: string
     default: https://app.contrastsecurity.com/Contrast
     description: >
-      Name of environment variable storing the URL of your Contrast
-      team server
+      The Contrast url for your instance. The default is https://app.contrastsecurity.com/Contrast
 
   org-id:
     type: string
@@ -76,7 +75,7 @@ steps:
       application-id: <<parameters.application-id>>
       username: <<parameters.username>>
       service-key: <<parameters.service-key>>
-      team-server-url: <<parameters.team-server-url>>
+      contrast-url: <<parameters.contrast-url>>
       org-id: <<parameters.org-id>>
       api-key: <<parameters.api-key>>
       vulnerability-threshold: <<parameters.vulnerability-threshold>>

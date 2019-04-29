@@ -2,13 +2,5 @@ description: >
   CircleCI's Python convenience image:
   https://hub.docker.com/r/circleci/python
 
-parameters:
-  tag:
-    type: string
-    default: latest-node
-    description: >
-      Pick a specific circleci/python image variant:
-      https://hub.docker.com/r/circleci/python/tags
-
 docker:
   - image: circleci/python:2.7.16-jessie-node-browsers-legacy

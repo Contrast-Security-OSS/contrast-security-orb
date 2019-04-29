@@ -12,25 +12,18 @@ usage:
     contrast: contrastsecurity/verify@x.y.z
 
   jobs:
-    test:
+    contrast-verify:
       executor: contrastsecurity/default
       steps:
         - checkout
 
-        - run:
-            name: Run tests
-            command: |
-              npm run contrast-e2e -- \
-                --application.version=$CIRCLE_BUILD_NUM
-
-        - run:
-            name: Wait for TeamServer to check build vulnerabilities
-            command: sleep 30
-
         - contrastsecurity/check-vulnerabilities:
-            application-id: your-app-id
+            severities: CRITICAL,HIGH,MEDIUM
+            org-id: (your org id)
+            application-id: (your application id)
+            contrast-url: https://app.contrastsecurity.com/Contrast
 
   workflows:
     test:
       jobs:
-        - test
+        - contrast-verify
