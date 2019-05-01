@@ -41,9 +41,9 @@ parameters:
 
   org-id:
     type: string
-    default: CONTRAST_ORG_ID
+    default: ""
     description: >
-      Name of environment variable storing your Contrast organization ID
+      The organization id for your Contrast organization. This can be found on the "Your Account" page in the Contrast UI.
 
   api-key:
     type: env_var_name

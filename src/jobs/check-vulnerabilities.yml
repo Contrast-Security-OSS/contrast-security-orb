@@ -21,7 +21,7 @@ parameters:
     type: string
     default: CRITICAL,HIGH,MEDIUM,LOW,NOTE
     description: >
-      What level(s) of severity of vulnerabilities are you interested in?
+      A comma-delimited list of serverities to use when filtering for vulnerabilities.
 
   application-id:
     type: string
@@ -49,9 +49,9 @@ parameters:
 
   org-id:
     type: string
-    default: CONTRAST_ORG_ID
+    default: ""
     description: >
-      Name of environment variable storing your Contrast organization ID
+      The organization id for your Contrast organization. This can be found on the "Your Account" page in the Contrast UI.
 
   api-key:
     type: env_var_name
