@@ -61,6 +61,11 @@ parameters:
 
 steps:
   - run:
+    name: Check for Python presence
+    command: |
+      ls <<parameters.python-path>>
+
+  - run:
       name: Install Python modules
       command: |
         if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
@@ -118,4 +123,4 @@ steps:
         if (vulns_open > <<parameters.vulnerability-threshold>>):
          print("Above the vulnerabilities threshold. Failing build.")
          sys.exit(1)
-        
+
