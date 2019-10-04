@@ -61,9 +61,11 @@ parameters:
 
 steps:
   - run:
-    name: Check for Python presence
-    command: |
-      ls <<parameters.python-path>>
+      name: Check for Python presence
+      command: |
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+        $SUDO pip install requests
 
   - run:
       name: Install Python modules
