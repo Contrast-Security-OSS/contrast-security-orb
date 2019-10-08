@@ -5,5 +5,5 @@ description: >
   The Contrast agent begins securing your code by adding sensors to the entire software stack of your applications - from runtime to custom code - to directly measure vulnerabilities and attacks. Contrast Assess continuously monitors all your code, including your libraries, for known and unknown vulnerabilities, and produces accurate results without dependence on application security experts.
 
   You can find this orb's source code in the following GitHub repository
-  https://github.com/Contrast-Security-OSS/contrast-security-
+  https://github.com/Contrast-Security-OSS/contrast-security-orb
   
