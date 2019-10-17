@@ -3,4 +3,14 @@ description: >
   https://hub.docker.com/r/circleci/python
 
 docker:
-  - image: circleci/python:2.7.16-jessie-node-browsers-legacy
+  - image: <<parameters.image>>:<<parameters.tag>>
+
+parameters:
+  image:
+    description: The name of image
+    default: circleci/python
+    type: string
+  tag:
+    description: The image version tag
+    default: 2.7.16-jessie-node-browsers-legacy
+    type: string
