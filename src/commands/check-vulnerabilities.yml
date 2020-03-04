@@ -92,7 +92,7 @@ steps:
         headers = {
          'Accept': 'application/json',
          'API-Key': os.path.expandvars("${<<parameters.api-key>>}"),
-         'Authorization': base64.b64encode(os.path.expandvars("${CONTRAST_USERNAME}:${CONTRAST_SERVICE_KEY}").encode('UTF-8')).decode('ascii')
+         'Authorization': base64.b64encode(os.path.expandvars("${<<parameters.username>>}:${<<parameters.service-key>>}").encode('UTF-8')).decode('ascii')
         }
 
         # Contrast Security API request to get vulnerabilities
