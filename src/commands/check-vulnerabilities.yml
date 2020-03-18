@@ -92,7 +92,7 @@ steps:
         headers = {
          'Accept': 'application/json',
          'API-Key': os.path.expandvars("${<<parameters.api-key>>}"),
-         'Authorization': base64.b64encode(os.path.expandvars("${<<parameters.username>>}:${<<parameters.service-key>>}"))
+         'Authorization': base64.b64encode(os.path.expandvars("${<<parameters.username>>}:${<<parameters.service-key>>}").encode('UTF-8')).decode('ascii')
         }
 
         # Contrast Security API request to get vulnerabilities
@@ -107,7 +107,7 @@ steps:
          sys.exit(1)
 
         # Parse the JSON content
-        json_data = json.loads(response.content)
+        json_data = response.json()
 
         vulns_all = 0
         vulns_open = 0
